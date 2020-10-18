@@ -1,0 +1,19 @@
+[개발툴.txt] 
+	파일위치 : \인수인계\2. 개발툴
+	폴더의미 : 개발툴
+==========================================================================================	
+[폴더정보]
+	[cache DB] : cache DB
+	[git 서버 설치관련] : git 서버 설치 방법
+		:git 클라이언트 설정.txt : git의 클라이언트 정보
+		:git을 서버에 설치.txt : git 서버 설치 방법
+	[KDiff] : 소스 비교
+	[Virtual Printer(동맥경화등에사용)] : 동맥경화등에서 사용하는 가상프린터(각 프린터 설정법은 "\인수인계\1. 소스\.net source\M2I_CISIF\자료" 에 존재)
+		:Zan Virtual Printer.zip : m2i에서 신규 설치시 사용하는 것
+		:블랙아이스_가상프린터.zip : ACK 업체에서 사용하던 것
+			
+	[VS.NET] : vs.net 개발에 사용하는 써드파티
+		:DevExpress : 
+		:spwinframework35 : spread for winform
+		:vb_vbpowerpacks:  Microsoft.VisualBasic.PowerPacks(printer, Line,shape등에서 사용됨) :필수설치 아님
+	[SetupVSPE.zip] : 가상 시리얼 포트 장치 프로그램

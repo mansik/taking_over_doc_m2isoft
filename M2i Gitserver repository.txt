@@ -1,0 +1,19 @@
+http://gituser@220.122.158.179:9090/scm/repo/git/m2i_cisif
+http://gituser@220.122.158.179:9090/scm/repo/git/m2i_dicomif
+http://gituser@220.122.158.179:9090/scm/repo/git/m2isoft_if_pcr
+http://gituser@220.122.158.179:9090/scm/repo/git/reqlabmngm
+
+http://gituser@220.122.158.179:9090/scm/repo/git/rocheharmonyforscl
+http://gituser@220.122.158.179:9090/scm/repo/git/RocheINFINITY
+
+http://gituser@220.122.158.179:9090/scm/repo/git/rochelaborder
+http://gituser@220.122.158.179:9090/scm/repo/git//rochelabresult
+http://gituser@220.122.158.179:9090/scm/repo/git/tat_ssjungang
+http://gituser@220.122.158.179:9090/scm/repo/git/zebra.print
+http://gituser@220.122.158.179:9090/scm/repo/git/vb6.iis
+http://gituser@220.122.158.179:9090/scm/repo/git/vb6.roche
+
+
+http://gituser@220.122.158.179:9090/scm/repo/git/Installed.ReqLabMngm
+http://gituser@220.122.158.179:9090/scm/repo/git/installed.rochelab
+인수인계문서 : http://gituser@220.122.158.179:9090/scm/repo/git/taking_over_doc

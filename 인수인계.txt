@@ -1,0 +1,123 @@
+[인수인계.txt]
+	파일위치 : 인수인계\
+==========================================================================================	
+[폴더 설명]
+	[1. 소스]
+		[.net source] 	: 폴더의미 : vb.net 용으로 개발된 source(cis, scl 의뢰검사, infinity용 프로그램): .net source.txt 에 각 폴더별 설명 존재
+		[VB6.IIS]	 	: 폴더의미 : iis 결과용 vb6 소스 -  VB6.IIS.txt에 각 폴더별 설명 존재
+		[VB6.Roche] 	: infinity 결과용 vb6 소스 :VB6.Roche.txt에 각 폴더별 설명 존재
+	[2. 개발툴] - 개발툴.txt에 각 폴더 설명 존재
+	[installed.reqlabmngm]  : 의뢰검사 설치파일 및 DB , conf.ini 파일
+	[installed.rochelab]  : infinity 설치파일 및 DB, conf.ini 파일
+	[+ CIS 설치] : CIS 설치에 필요한 자료만 모아둠. 소스- .net source - M2I_CISIF 폴더에서 자료를 뽑아 놓은 것임.
+==========================================================================================
+[infinity 결과 vb6 소스 위치(2군데 존재함)
+	1)컴퓨터 : 59.23.195.70 폴더 : D:\[M2I_SOFT]\[M2I Source]\001.Source\INFINITY\결과 VB6
+	2)git 위치 [소스위치 : http://계정@59.23.195.70:9090/scm/repo/git/vb6.roche]
+
+[각 병원 설치본 저장] : 
+	1) installed.reqlabmngm : 의뢰검사 설치파일 및 DB , conf.ini 파일
+		:git 위치 : [소스위치 : http://계정@59.23.195.70:9090/scm/repo/git/installed.reqlabmngm]
+	2) installed.rochelab : infinity 설치파일 및 DB, conf.ini 파일
+		:git 위치 : [소스위치 : http://계정@59.23.195.70:9090/scm/repo/git/installed.rochelab]
+
+[seetrol 상시]
+	[server : help , 아이디 : m2i/m2i]		
+		: 목포중앙병원_INFINITY
+		: 순천미즈병원_INFINITY
+		: 익산_익산병원_p312 (2020.09.01부로 INFINITY M2I꺼 사용안함)
+		: 안성성모병원N
+	[server : 1515 , 아이디 : inf/1234]
+
+
+[git을 서버에 설치 방법] : 원본파일 위치 : \인수인계(김만식)\2. 개발툴\git 서버 설치관련\git을 서버에 설치.txt
+	1. java 설치 :jre (git 실행에 필요)
+
+	2. git 설치(https://git-scm.com/)
+
+	3. SCM Manager 설치(standalone방식), 방화벽 허용, 사용자
+	http://www.scm-manager.org/download/
+
+
+	[SCM Manager 관련 설정 파일 위치 : 사용자\사용자 계정\.scm\config]
+
+	[scm-server 실행 순서]
+
+		* D:\scm-server\bin\scm-server.bat(반드시 실행되고 있어야 한다.) 실행 후 웹으로 접속(scmmanager)
+
+	[scmmanager]
+
+		* 변경 : http:\\localhost:9090 로 접속(scmadmin : 911vs119)
+		* 기본 : http:\\localhost:9090 로 접속(scmadmin : scmadmin)
+		* >> 윈도우 방화벽 인바운드 9090 포트 허용
+
+
+	[config - repository types] : git settings 를 제외한 나머지는 disabled  체크
+
+		* git settings
+		* repository directory : d:\repositores\git 로 변경
+
+
+	[security - users]
+
+		* :add : 사용자 추가
+		* id : gituser
+		* 
+
+		* :scmadmin pwd 변경
+		* scmadmin/911vs119
+
+
+	[Main - repositories 추가]
+
+		* name : emr.m2isoft.git
+		* type : git
+		* repositories 생성후 사용자 추가 :  permissions 설정 : group : 체크,  name : users, permissions:write
+
+
+	[SCM Manager 관련 설정 파일 위치 : 사용자\사용자 계정\.scm\config폴더백업해 놓음]
+
+	[repositories의 프로젝트 명칭을 변경하는 법]
+		1.scm-server 중지
+		2.SCM Manager 관련 설정 파일 위치에서 repositories.xml파일을 수정(사용자\사용자 계정\.scm\config\repositories.xml)
+		3.실제 repositories 가 저정되는 폴더에서 폴더명칭 변경
+		4.scm-server 실행후 scmmanager(http:\\localhost:8080)에 들어가서 확인하면 됨.
+
+
+	[클라이언트 소스가져오기]
+
+		[원격저장소 설정]
+		http://계정@59.23.195.70:9090/scm/git/AdoNetSample
+
+
+[m2i git 저장소]
+	
+	[admin 계정]
+		scmadmin/911vs119
+		
+	[사용자 계정]
+		계정 : 메일계정의 @앞
+		디폴트비번 : 메일계정의@까지
+		Ex) aa.kk@m2isoft 메일계정을 가지고 있을경우 계정 : aa.kk, 비번은 aa.kk@
+
+	[원격저장소]
+		*계정은 사용자 계정으로 로그인
+		
+		[참고]
+			AdoNetSample         : http://계정@59.23.195.70:9090/scm/repo/git/AdoNetSample
+			M2ISOFT 소스 관리 예시    : http://계정@59.23.195.70:9090/scm/repo/git/M2ISOFT_Source_manage_example
+			*zebra print 설정        : http://계정@59.23.195.70:9090/scm/repo/git/zebra.print
+		[소스]
+			*roche 검사결과((infinity))    : http://계정@59.23.195.70:9090/scm/repo/git/rochelabresult
+			
+							   --roche 검사오더 + vb6.roche 같이 설치해야됨.
+			*roche 검사오더(infinity오더)    : http://계정@59.23.195.70:9090/scm/repo/git/rochelaborder
+			*vb6.roche(infinity 결과)        : http://계정@59.23.195.70:9090/scm/repo/git/vb6.roche
+
+
+			*SCL, 의뢰검사(sqlite)    : http://계정@59.23.195.70:9090/scm/repo/git/reqlabmngm
+			*건협CIS            : http://계정@59.23.195.70:9090/scm/repo/git/m2i_cisif        
+		[설치본]    
+			roche 설치본         : http://계정@59.23.195.70:9090/scm/repo/git/installed.rochelab
+			의뢰검사관리 설치본(각 병원별): http://계정@59.23.195.70:9090/scm/repo/git/Installed.ReqLabMngm
+		

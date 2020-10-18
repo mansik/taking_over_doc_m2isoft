@@ -1,0 +1,801 @@
+[.net source 정보.txt] 
+	파일위치 : 인수인계\1. 소스\.net source\
+	폴더의미 : vb.net 용으로 개발된 source(cis, scl 의뢰검사, infinity용 프로그램)
+==========================================================================================	
+ -사전지식- 
+소스의 "참고사항.txt" 를 먼저 참고할 것.
+대부분의 .net source는 
+	0. git 서버에 존재(http://계정@59.23.195.70:9090/scm/repo/git/프로그램명칭)
+	1. nuget 사용하였음(visual studio -> 도구 -> neget 패키지 관리자 -> 솔루션용 Nuget 패키지 관리) : 대부분의 DB연동은 nuget 패키지를 사용(mssql, sqlite, oracle, postgres..)
+	2. 실행파일 폴더는 "솔루션\실행파일" 에 존재
+	3. DB 스크립트, 테이블 정의서는 솔루션내 "DB"폴더내에 존재
+	4. CONF.INI 사용
+	5. 설치 현황 및 거래처 연락처는 "xxx 거래처 현황.xlsx" 에 존재
+	6. 병원 설치시 폴더명칭은 대부분 프로젝트 명칭을 그대로 사용하며 폴더를 생성하며, 실행파일 폴더에서 dll, ini, exe 파일 및 x64폴더, x86폴더 복사
+	7. m2i_cisif, reqlabmngm , rochelabresult 프로그램은 실행후 메뉴-도움말이 있음.
+	8. 로컬DB는 mssql 2017이상, sqlite(nuget 패키지 관리자를 통해 추가했음.)를 사용 	
+	9. 써드파티
+		spread : Spread for Windows Forms 5(.NET Framework 3.5)
+		devexpress : DevExpressComponentsBundle-18.2.7
+	10. 솔루션 디렉토리 구조
+		[솔루션명]
+			- [Classes] : 솔루션전체에서 사용하는 class
+			- [DB] : DB 스크립트, 테이블 정의서
+			- [프로젝트명]
+				-- Classes : 해당 프로젝트에서 사용하는 class
+			- [프로젝트명]
+			- [실행파일]
+			- [자료] : 참고자료
+			병원정보.txt : 각 병원별 연락처 및 설정 정보(필수로 읽어 볼것)
+			참고사항.txt : 프로젝트 참고사항(필수로 읽어 볼것)
+			수정사항.txt : 수정 히스토리
+			xxx 거래처 현황.xlsx : 거래처 설정 및 연락처 등 정보
+	11. git에서 
+		1) installed.reqlabmngm : 의뢰검사 설치파일 및 DB , conf.ini 파일
+		2) installed.rochelab : infinity 설치파일 및 DB, conf.ini 파일
+		
+==========================================================================================			
+[sqlite DB툴]
+	: DB Browser for SQLite : https://sqlitebrowser.org/
+		
+[CacheDBTest.git]
+	[소스위치 : 인수인계\1. 소스\.net source]
+	광주첨단병원 cacheDB 접속해서 조회하는 샘플 프로그램
+	Cache 작업방법.txt 참고
+	
+[M2I_CISIF] : cis 인터페이스 프로그램, CIS 이미지를 CIS 서버에 저장
+	[소스위치 : http://계정@59.23.195.70:9090/scm/repo/git/m2i_cisif]
+	*중요 : 심전도는 인터페이스 안함 -> INFINITT 업체에서 인터페이스 함
+	[로컬DB : MSSQL db 사용, DB 서버 따로 존재]
+	용어 : 건협 mics(OCS프로그램 명칭)
+
+	#.프로세스
+		장비 ->cis 서버    : 장비 -> 장비인터페이스 프로그램 -> M2I_SOFTIF 프로그램 -> CIS 서버로 파일 전송(ftp) -> 병원DB update 
+		CIS 서버의 파일 백업 :CIS 서버의 파일 - > ynology cloud station backup 프로그램 - > NAS 로 백업
+		
+		1)장비측정  
+		2)장비에서 결과 파일 받기
+		2-1)장비인터페이스 프로그램이 있는 경우(지엠메디컬에서 설치)
+			(1) '#장비 이미지 경로'로 이미지, 결과파일 생성
+				<'#장비 이미지 경로'> 폴더 구조
+				[pacs_image] : 장비에서 저장되는 이미지 및 결과파일, 폴더명이 [VSDATA] 등 장비마다 다를 수 있음(CONF.INI에 "EQPM_IMAGE_PATH = "의 폴더)
+					 : SERIAL 통신인 경우 M2I_CISIF 프로그램에서 이미지 및 결과파일 생성함.	
+					 : C:\, 또는 d:\에 존재
+		2-2)장비인터페이스 프로그램이 없는 경우 -> 시리얼 통신
+			(1) M2I_SOFTIF 프로그램에서 시리얼 통신을 통해 
+			(2) '#장비 이미지 경로'로 이미지, 결과파일 생성
+		3)M2I_SOFTIF 프로그램
+			(0)conf.ini 를 통한 환경설정 파일 읽음
+			(1)TIMER를 사용하여 '#장비 이미지 경로'에서 '#로컬 이미지 경로'로 이미지 및 결과 파일을 [M2I_SOFT] - [장비코드] 폴더로 파일명을 아래와 같이 변경해서 복사			
+				<'#로컬 이미지 경로' 폴더 구조>
+				[M2I_SOFT] : 장비에서 받은 결과 파일이 저장되는 폴더(이미지 파일(jpg), 결과파일(txt, csv) :  확장자는 conf.ini에 "LOCAL_IMAGE_PATH = "에 설정
+					- [BCA] : 장비코드 (conf.ini에서 설정)별 폴더가 프로그램 실행시 자동을 생성됨
+						: [pacs_image]폴더의 파일을 TimerSendMakeImageFileName 에 의해서 3초 간격으로 이 폴더로 이동됨
+						: 이동된 파일명 :  
+							:등록번호13자리_20191203_PW_0.jpg : 이미지파일명, 이미지 1장인 경우
+							:등록번호13자리_20191203_PW_1.jpg : 이미지파일명, 이미지 여러장인경우
+							:등록번호13자리_20191203_PW_0.csv : 결과파일명 (장비에서 csv로 생성됨)
+							:등록번호13자리_20191203_PW_0.txt: 결과파일명 (장비에서 txt로 생성 또는 동맥경화의 경우 이미지 파일에서 결과 추출할 경우 Zan Printer 에서 txt로 결과 변환해서 생성)
+						: conf.ini의 IMAGEFILENAME_MAKE_YN = Y인 경우 M2I_CISIF 프로그램에서 [전송]버튼을 눌러야 서버에 저장됨
+						: conf.ini의 IMAGEFILENAME_MAKE_YN = N인 경우 자동으로 서버에 저장됨
+					  - [Send]	: 서버로 전송 + 병원DB에 저장 성공한 파일이 이동, 자동으로 폴더 생성
+					  - [NotSend] : 서버로 전송 + 병원DB에 저장 실패한 파일이 이동, 자동으로 폴더 생성, 
+								: 해당 이미지와 결과파일을 [장비코드]폴더의 루트로 이동하면 다시 서버로 전송을 실행할 수 있다.			
+			(2) 파일을 CIS서버로 FTP로 전송 : conf.ini파일에 따라 자동, 수동 전송 여부 결정 
+			(2-1) IMAGEFILENAME_MAKE_YN = Y 인 경우 : 화면에 이미지, 결과 파일을 보이지 않고 자동 전송
+			(2-2) IMAGEFILENAME_MAKE_YN = N 인 경우 : 화면에 이미지, 결과 파일을 보여주고 사용자가 환자를 선택하여 전송
+
+			(3-1) 정상적으로 전송된 경우
+				:1. 병원DB update
+				:2.  [M2I_SOFT] - [장비코드] 내 파일을 [M2I_SOFT] - [장비코드] - [Send] 로 이동
+			(3-2) 전송이 안된 경우
+				:1.  [M2I_SOFT] - [장비코드] 내 파일을 [M2I_SOFT] - [장비코드] - [NotSend] 로 이동			 
+			
+		4) FTP 서버
+			(1) 전송된 파일을 synology NAS 로 실시간 백업(synology cloud station backup  프로그램 사용)
+			(2) synology NAS 설정은 '건협 CIS 서버 설치 메뉴얼.pptx' 참고- 위치는 아래 언급되어 있음
+		
+		5) synology NAS 에서 복구하는 방법은 synology NAS 설정은 '건협 CIS 서버 설치 메뉴얼.pptx' 참고- 위치는 아래 언급되어 있음
+			(1) synology cloud station backup 프로그램실행
+			(2) 버전 탐색기 클릭(실행)
+			(3) 버전 탐색기  좌측화면에서 복원을 원하는 상위 폴더를 선택(ex. 20200511폴더 복원의 경우 CISFTP 선택)
+			(4) 버전 탐색기  우측화면에서 복원을 원하는 폴더를 선택 
+			(5) 아래에서 복구를 원하는 버전을 클릭(“<“버튼옆의 “@”버튼 클릭하여 현재 버전 선택됨
+			(6) 복원 버튼 클릭
+				
+	#. 운영프로그램 폴더 구조 : 건협폴더		
+		파일 이동 경로 : [pacs_image](장비에서 저장되는 폴더) -> [M2I_SOFT] - [장비코드] 폴더의 루트 -> 보낸 경우 -> [Send]
+																					  -> 못 보낸 경우 -> [NotSend]
+		[M2I_CISIF] : 실행파일, ini 파일, dll 파일
+		[M2I_SOFT] : 장비에서 받은 결과 파일이 저장되는 폴더(이미지 파일(jpg), 결과파일(txt, csv) :  확장자는 conf.ini에 "LOCAL_IMAGE_PATH = "에 설정
+			- [BCA] : 장비코드 (conf.ini에서 설정)별 폴더가 프로그램 실행시 자동을 생성됨
+					: [pacs_image]폴더의 파일을 TimerSendMakeImageFileName 에 의해서 3초 간격으로 이 폴더로 이동됨
+					: 이동된 파일명 :  
+							:등록번호13자리_20191203_PW_0.jpg : 이미지파일명, 이미지 1장인 경우
+							:등록번호13자리_20191203_PW_1.jpg : 이미지파일명, 이미지 여러장인경우
+							:등록번호13자리_20191203_PW_0.csv : 결과파일명 (장비에서 csv로 생성됨)
+							:등록번호13자리_20191203_PW_0.txt: 결과파일명 (장비에서 txt로 생성 또는 동맥경화의 경우 이미지 파일에서 결과 추출할 경우 Zan Printer 에서 txt로 결과 변환해서 생성)
+					: conf.ini의 IMAGEFILENAME_MAKE_YN = Y인 경우 M2I_CISIF 프로그램에서 [전송]버튼을 눌러야 서버에 저장됨
+					: conf.ini의 IMAGEFILENAME_MAKE_YN = N인 경우 자동으로 서버에 저장됨
+				- [Send]	: 서버로 전송 + 병원DB에 저장 성공한 파일이 이동, 자동으로 폴더 생성
+				- [NotSend] : 서버로 전송 + 병원DB에 저장 실패한 파일이 이동, 자동으로 폴더 생성, 
+							: 해당 이미지와 결과파일을 [장비코드]폴더의 루트로 이동하면 다시 서버로 전송을 실행할 수 있다.
+							
+		[pacs_image] : 장비에서 저장되는 이미지 및 결과파일, 폴더명이 [VSDATA] 등 장비마다 다를 수 있음(CONF.INI에 "EQPM_IMAGE_PATH = "의 폴더)
+					 : SERIAL 통신인 경우 M2I_CISIF 프로그램에서 이미지 및 결과파일 생성함.	
+					 : C:\, 또는 d:\에 존재
+		
+		
+	0.연락처
+		건협 본부 CIS 관련 담당자 연락처 : 권희성 : 010-5790-9990
+		건협 본부 CIS 관련 책임 연락처  : 
+		지엠메디컬 :부인환차장(전국) : 010-6373-9804	 
+				:이진우과장(서울) : 02-2055-2255, 010-8980-2203
+				:노은호차장(대구,경북) : 010-5342-0069
+				:김세종(충청) 	  :	010-8830-3313
+				:부산		  :	010-9750-7121
+				:양재석팀장(전북) :	010-3451-9584
+		옵니씨엔에스(OMNIFIT 장비) :	070-7335-1177
+	1. 프로그램 : 
+		: AutoUpdate : 자동update
+		: M2I_CIS_VIEWER : cis viewer
+		: M2I_CISIF : cis 인터페이스
+		: M2I_PACSDB : M2I_CISIF에서는 사용안함, 부산지부에서 M2I_DICOMIF 프로그램 사용했을때 EKG DB에 추가 정보  UPDATE 용으로 사용했었음
+	2. 프로그램 : nuget 사용 : fo-dicom (v1.0.37), NLog (v4.6.2), oracle.managedDataAccess(v19.3.1)
+			       설정방법 : visual studio -> 도구 -> neget 패키지 관리자 -> 솔루션용 Nuget 패키지 관리
+			1) FrmCISIF.vb : 메인폼
+			2) DicomCreate.vb : dicom 파일 생성 및 pacs 서버 전송 모듈
+			3) DicomInfo.vb : dicom 정보저장 class
+			4) HospInfo.vb : 병원정보 셋팅 class
+			5) ModCISIF.vb : (메인모듈)cis 관련 프로시저 모듈
+			아래는 각 검사별, 장비종류별 모듈임(명명규칙 : ModCISIF_검사종류_장비종류.vb)
+			6) ModCISIFBP.vb : 혈압 모듈
+			7) ModCISIFHW.vb : 키몸무게 모듈
+			8) ModCISIFINBODY720.vb, ModCISIFINBODY770.vb : INBODY 720,770 모듈(INBODY 장비종류별 존재)
+			9) ModCISIFINBODYXSCANPLUS2.vb, ModCISIFINBODYXSCANPLUS950.VB : INBODY XSCANPLUS2, XSCANPLUS950 모듈
+			10) ModCISIFOP.VB : 안압 모듈
+			11) ModCISIFPW.VB : 동맥경화 모듈
+			12) ModCISIFSTOMNIFIT.VB : 스트레스 OMNIFIT 장비 모듈
+			13) ModCISIFSTSA6000.VB : 스트레스 SA6000 장비 모듈
+			14) ModCISIFVF.VB : 폐기능 모듈
+			
+			15) ModCISSerial.VB : 시리얼통신 관련 모듈
+	3. 참고 문서
+		1) \참고사항.txt
+		2) \수정사항.txt
+		3) \cis 사용법.txt
+		4) \병원정보.txt
+		5) \CISIF 거래처 현황.xlsx 
+		6) \KAHP CIS Interface 개발사항 v3.pptx
+		7) \건협 CIS 서버 설치 메뉴얼.pptx 
+			: NAS 설정법
+			: NAS 복원법
+			: CIS 서버의 SQL은 사용안함.(삭제해도 무방함).
+			: FTP 사용(PORT : 8081, 계정 : cis_ftp/user@1234, AUTOUPDATE.EXE 파일을 통해서 자동 UPDATE 됨)
+		8) M2I_CISVIEWER_MICS 프로그램용.zip : 건협 신규 OCS(MICS)에서 호출시 사용할 뷰어 프로그램 (각 지부별 CONF.INI에서 db 부분만 수정해야 됨)
+			:지부별로 mics 에 넣어 배포하는 것은 건협본부(권희성:)에서 함.
+			:건협 본부 CIS 관련 담당자 연락처 : 권희성 : 010-5790-9990
+			:(중요)conf.ini의 SERVER_NAME을 지부별로 해당 지부에 맞게 해야만 해당지부의 데이터가 조회됨.
+
+			파일내용: 
+				autoupdate.exe : M2I_CIS_VIEWER.exe 프로그램 자동update용 파일
+				conf.ini : 지부별 서버 ip를 확인해야됨(아래 "8. M2I_CISVIEWER_MICS 프로그램용.zip 파일내 conf.ini 내용" 참고)
+				M2I_CIS_VIEWER.exe : 건협 mics
+				Oracle.ManagedDataAccess.dll : 오라클 접속 dll
+				TestExecuteViewer.exe : 필요 없음
+				
+	4. 건협 CIS 서버 정보 : CIS 이미지 저장 및 프로그램 자동 UPDATE를 하기위한 용도
+		설정 : \건협 CIS 서버 설치 메뉴얼.pptx 참고 
+		
+		Ip : 10.xx.1.29
+		계정 : administrator/password1!
+		DB : sa/cis@user1
+		ftp : cis_ftp/user@1234
+		ftp 폴더 : d:\CISFTP 		
+		###############################################
+		#[ftp서버의 M2I_CISIF폴더내 파일 설명] 
+		###############################################
+			: M2I_CISIF.exe : 건협 신규 OCS(MICS)용 CIS 이미지 전송 프로그램
+			: M2I_CIS_VIEWER.exe : 건협 신규 OCS(MICS)용 전체 CIS 이미지 보는 프로그램
+			: AutoUpdate.exe : 건협 신규 OCS(MICS)용 자동업데이트 프로그램
+			: update.txt : 자동 update용 파일
+				
+			: M2I_CISIF.zip : 건협 신규 OCS(MICS)용 CIS 프로그램	
+			: M2I_CISVIEWER_MICS 프로그램용.zip : 건협 신규 OCS(MICS)에서 호출시 사용할 뷰어 프로그램 (각 지부별 CONF.INI에서 db 부분만 수정해야 됨), 
+	5. 건협 NAS 서버 정보 : 서버의 CIS 이미지를 백업 및 cis 프로그램 자동 update 폴더 존재
+		설정 : \건협 CIS 서버 설치 메뉴얼.pptx 참고 
+		
+		CIS synology NAS(이미지 백업) 
+		ip : 10.xx.1.30
+		nas 명칭 : cis_backup
+		계정 : admin / cis@cis.com
+		사용자 : cis /m2isoft.com 
+        그룹 : users		
+	6. M2I_CISIF\자료 폴더(*표시는 중요함)
+		: *(설정)Black ice printer 설정 : 가상프린터로 동맥경화등 일부 장비에서 화면을 이미지 파일로 전환시켜주는 프로그램의 설정, ACK 업체에서 깔았음. ZAN 프린터로 대체해도 됨.
+		: *(설정)Zan 프린터 설정 : 가상프린터로 동맥경화등 일부 장비에서 화면을 이미지 파일로 전환시켜주는 프로그램의 설정, 가상프린터 신규설치시  Black ice printer 대신 ZAN PRINT 사용할 것.
+		: *(설정)장비 설정 : 각 장비별 환경설정 방법
+		: *M2I_CISIF INI: 지부별, 장비별 INI 파일이 들어 있음
+		: M2I_DicomIF INI : 예전 프로그램의 INI 파일로 현재는 사용하지 않음
+		: USBToSerial Driver: USB TO SERIAL 드라이브
+		: *Virtual Printer(동맥경화등에사용)\Zan Virtual Printer.zip : 가상프린터 실행파일
+		: 건협설정 및 쿼리 : 개발시 사용한 쿼리, (삭제해도 무관)
+		: 장비별 결과 : CIS 장비의 장비별 결과
+		: 지부별 결과 : CIS 장비의 지부별 결과
+		: 건협CIS신규정리.xlsx : 신규 설치한 경우 작성해서 추후 요청시 주면됨
+		
+	7. CIS 중 일부 장비는 장비업체에서 장비에서 오는 data를 받는 인터페이스 프로그램이 설치 되어 있음 , 이 프로그램들은 장비 업체(지엠메디컬, 인바디)에 연락하여 설치해 줄라고 해야됨.
+		이경우 m2i_cisif 프로그램은 장비 인터페이스와 작업이 일어난다.
+		
+	8.  M2I_CISVIEWER_MICS 프로그램용.zip 파일내 conf.ini 내용
+			
+		#SERVER_NAME을 지부별로 해당 지부에 맞게 해야만 해당지부의 데이터가 조회됨.
+		#그외의 데이터는 그대로 사용하면 됨.
+		##################################################
+		#서울서부건협 PW	동맥경화도	VP1500
+		##################################################
+		[HOSP DB] 
+		DB_TYPE = ORACLE
+		SERVER_NAME = 10.10.1.101
+		DB_NAME = MICS
+		DB_PORT = 1522
+
+
+		[EQPM]
+		#장비코드
+		EQPM_CODE = VS1000
+
+		[ORDER INFO]
+		#ITEM_CODE : 검사코드
+		ITEM_CODE = B1201
+		#MODALITY : 장비코드 : BCA, BP, EKG, HW, OP, PFT, PW, ST
+		MODALITY = PW
+		#STATION_NAME : 검사실위치 (일단은 MODALITY와 동일하게 사용)
+		STATION_NAME = PW
+
+		[IMAGE FILE PATH]
+		#장비 이미지 경로
+		EQPM_IMAGE_PATH = c:\ 
+		#로컬 이미지 경로
+		LOCAL_IMAGE_PATH = 
+		#IMAGE 파일 확장자
+		IMAGE_EXTENSION = jpg
+		#RESULT 파일 확장자
+		RESULT_EXTENSION = 
+		
+		[OPTION]
+		# 로그생성 - log 디렉토리에 로그 내용 저장(1), 저장안함(0)
+		SAVE_LOG = 1
+		#RESULTFILE 보관기간
+		RESULTFILE_RETAIN_PERD = 92
+		#LOG 보관기간
+		LOG_RETAIN_PERD = 92
+		#DICOM 보관기간
+		DICOM_RETAIN_PERD = 10
+
+		#default 확대 축소 배율(-50,-40,-30,-20,-10,0,10,20,30,40,50)
+		IMAGE_DEFAULT_ZOOM = -80
+		#LstStatus FONT SIZE
+		STATUS_FONT_SIZE = 9
+
+		#화면 최대화
+		FORM_MAXIMIZED_YN = N
+
+		#오더를 통해서 IMAGE 파일명을 만들어야 하는 경우(IMAGE 파일에 날짜 및 차트번호 없는 경우)
+		IMAGEFILENAME_MAKE_YN = Y
+		#여러 이미지 파일 사용
+		MULTI_IMAGE_YN = N
+		#장비에서 만든 파일이 EQPM_IMAGE_PATH의 subfolder에 있을 경우 EQPM_IMAGE_PATH로 가져오기
+		MOVE_SUBEQPMIMAGEPATH_TO_EQPMIMAGEPATH_YN = N
+		
+	
+		
+[M2I_DICOMIF](사용안함) : 구cis 인터페이스 프로그램
+	[소스위치 : http://계정@59.23.195.70:9090/scm/repo/git/m2i_dicomif, 브런치 : masterMulti_CISSERVER_작업전(대구이외), masterMulti(대구, cisserver용)]
+	[로컬DB : 서버용 버전이 아닌 경우 로컬db 사용 안함, 서버용 버전(대구지부만)에서는 MSSQL db 사용]
+	
+	1. M2I_CISIF전의 프로그램에서 건협OCS 교체전의 CIS 프로그램임
+	2. 이미지를 PACS로 전송
+	
+[M2ISOFT_IF_PCR] (사용안함) : 계대동산병원 PCR 용 인터페이스 프로그램
+	[소스위치 : http://계정@59.23.195.70:9090/scm/repo/git/m2isoft_if_pcr]
+	[계대동산병원 웹서비스를 통한 통신(참고사항.txt 참고)]
+	[로컬DB : sqlite db 사용]
+	
+	#. 프로세스
+		장비 결과(EXCEL)	 --------->		병원	
+	
+	1. 계대동산병원 오더 조회, 결과 저장 프로시저가 미완성되어 사용안함.
+	2. 계대동산병원 전산실에서는 프로시저 제공못해준다고 했음	
+	3. 병원오더 조회, 결과 저장 루틴을 수정하면 타 병원에서 사용가능
+	4. 프로그램 : nuget 사용, 웹서비스 사용
+		1) frmMain.vb : 메인폼
+		2) modHospData.vb : 로그인(GetHospitalOrderDT), 오더조회(GetHospitalLoginDT), 결과저장(SaveHospitalResult) 프로시저 모듈
+		3) modIFPCR.vb : (메인모듈)PCR 관련 프로시저 모듈	
+		4) WebDongSan.vb : 동산병원 웹서비스 관련 클래스		
+	5. 참고 문서
+		1) 참고사항.txt
+		2) 병원정보.txt
+		3) if 거래처 현황.xlsx
+	6. \자료 폴더
+		1) 계대동산병원\CFX96장비\ : CFX96장비에서 나오는 결과파일 및 타 업체 인터페이스 화면
+		2) 계대동산병원\VB60소스\ : PCR 연동 인터페이스 소스인데 동산병원과는 맞지 않음
+		3) 계대동산병원\web service.txt : 동산병원에서 사용하는 웹서비스
+		4) 계대동산병원\동산병원 작업요청v1.txt, 계대동산병원\동산병원 작업요청v2.txt : 동산병원 웹서비스 호출시 사용하는 함수, 인자지만 안맞음. 오류발생(기존 인터페이스 업체를 통해 받음)
+			받은 자료는 기존 인터페이스 업체를 통해 받았으나 이것이 아닌 다른방법으로 기존인터페이스를 코딩한 것 같음. 제대로 된것을 주지는 않음.
+	
+[ReqLabMngm] : SCL 의뢰 검사 프로그램(보훈병원용, 보훈병원이외병원용 2가지 버전 존재)
+	[소스위치 : http://계정@59.23.195.70:9090/scm/repo/git/reqlabmngm, 브런치 : master(일반병원용), 보훈병원(SQL)(보훈병원전용)]
+	[SCL dll : scl 에 오더 전송, 결과 받기용]	
+		HttpDll.dll(size : 9kb) : C#용 dll, scl에서 받음 ,\실행파일\ 폴더 또는 \자료\SCL\C#용\ 폴더에 존재
+		: \자료\SCL 폴더 참고
+			: OCS-데이타 송수신규약-20130506.ppt
+			: SCL Dll호출방법-c#.txt
+			: SCL - DLL 방식 OCS 연동.txt
+			: SCL 송신데이터 항목 정보.txt
+			
+	[로컬DB : sqlite db 사용]
+		: 병원설치시 실행파일 폴더내 DB 폴더에 LabReqScl.db 복사
+		: 디버그시 DB 폴더에 LabReqScl.db를 사용함.
+		
+	#.프로세스
+		병원DB <---------------> SCL
+		
+		0) HttpDll.dll 사용(scl에서 제공함)
+		1)ReqLabMngm 프로그램 실행(보훈병원용, 보훈병원이외병원용 2가지 버전)
+			(0)conf.ini 를 통한 환경설정 파일 읽음
+			(1) 보훈병원용은 진검용, 병리용(광주보훈병원, 대전보훈병원) 으로 나누어지는데 
+				프로그램은 1개이지만 conf.ini의 셋팅에 따라 다름
+				ini 위치 : 소스폴더-[자료]-[보훈병원 ini]-각병원별 폴더에 conf_병리.ini
+						: [installed.reqlabmngm}폴더-각병원별 폴더에 conf_병리.ini
+			(2) 보훈병원용의 경우 로컬DB는 SCL 본사에 존재한다. - table 구조는 
+			
+		2) 의뢰검사 전송
+			(1) "검사 의뢰" 탭에서 
+			(2) 해당날짜 선택하여 [조회]버튼
+				:1. 전송이 안된 것은 spread 맨앞쪽 컬럼에 자동으로 체크됨
+				:2. 이미 전송이 된 것은 자동으로 체크 안됨, 만약 다시 전송할려면 체크 
+			(3) [검사의뢰] 버튼으로 전송 : 체크된 것만 전송됨
+		3) 결과 받기
+			(1) "검사 결과" 탭에서 
+			(2) [결과수신] 
+				:1. 병원DB에 이전에 저장하지 않은 경우만 spread 맨앞쪽 컬럼에 자동으로 체크됨
+				:2. 병원DB에 이전에 저장한 경우 자동으로 체크 안됨, 만약 다시 전송할려면 체크
+				:3. 보훈병원
+			(3) [결과저장] : 체크된 것만 저장
+			
+	#신규설치 프로세스 : 아래 "6. 신규 병원이 선정될 경우 작업방법" 참조
+			
+	0. 연락처
+		SCL 연락처					
+		본사			김애란 이사	010-4565-5763		
+					이은아팀장(보훈병원)	010-4505-7494		
+		보훈병원 담당	김장주 보훈병원 담당	010-4925-1782	02-330-2190	jangju_kim@scllab.co.kr
+		보훈병원이외병원 담당	현정민 보훈병원이외병원 담당(주1)		02-330-0528	jeongmin_hyun@scllab.co.kr
+						조영재 보훈병원이외병원 담당(주2)	010-3967-5223		youngjae_cho@scllab.co.kr
+						김여현 보훈병원이외병원 담당(부)	010-5097-9173		yeonhyun_kim@scllab.co.kr
+		대구			김주홍 소장	010-2524-7197		
+					조용현(나사렛연합내과 담당)	010-3393-0103		
+					하동훈 소장(대경방사선 담당)	010-3253-6655		
+		대구보훈영업소	서명교(대구보훈 담당)	010-6666-1648		
+		부산보훈영업소	이정화 소장	010-6656-1275		
+					송찬우 대리(부산푸른의원)	010-4008-7184		
+		광주보훈영업소	임상도 소장	010-3617-1023		
+					김양수 대리	010-4404-5779		
+		대전보훈영업소	김재원 소장	010-8408-8842		
+		
+
+	1. SCL 로 의뢰 검사를 의뢰 하고, 결과를 병원DB에 저장하는 프로그램
+	2. 보훈병원용, 보훈병원이외병원용 2가지 버전 존재 
+		: GIT 에서 브런치가 "보훈병원(SQL)"은 보훈병원용
+		: GIT 에서 브런치가 "MAST"는 보훈병원이외병원용
+	3. 보훈병원용은 진검용, 병리용(광주보훈병원, 대전보훈병원) 으로 나누어지는데 프로그램은 1개이지만 conf.ini의 셋팅에 따라 다름
+		1) ini 위치 : 소스폴더-[자료]-[보훈병원 ini]-각병원별 폴더에 conf_병리.ini
+		 		   : [installed.reqlabmngm}폴더-각병원별 폴더에 conf_병리.ini
+	3. 프로그램 : nuget 사용 : Entity Framework, oracle.managedDataAccess(v12.2.1100), system.data.sqlite(v1.0.108)
+			설정방법 : visual studio -> 도구 -> neget 패키지 관리자 -> 솔루션용 Nuget 패키지 관리
+			1) frmMain.vb : 메인폼
+				: SendOrderSCL() : SCL보내기, 체크된것만 보내기
+				: ReceiveResultSCL() : SCL 결과 받기
+			2) modHospData.vb : 병원별 오더조회(GetSelectHospOrderDataTable, ImportHospOrderFromExcel), 결과저장(SaveHospResult) 프로시저 모듈
+				: GetSelectHospOrderDataTable() : 병원DB 오더 조회 쿼리
+				: ImportHospOrderFromExcel() : 병원DB가 아닌 excel(이온엠)의 오더 조회
+				: SaveHospResult() : 병원DB 또는 excel(이온엠)에 결과 저장
+			3) modReqLabMngm.vb : (메인모듈)의뢰검사 관련 프로시저 모듈			
+				: GetSelectLocalDBQuery() : 'LabOrder(로컬db) table 조회(검사의뢰, 검사결과)
+				: GetSaveLocalDBQuery() : 오더를 LabOrder(로컬db)에 저장시 자용하는 쿼리
+				
+				: GetSendParam() : 의뢰업체에 보내는 항목 정의(ocsHead 정의)
+				: SetReceiveParam() : 결과수신시 parameter(ocsHead 정의)
+				: SetReceiveItemData() : SCL의 결과항목별 값 셋팅(공통부분+각 병원별 추가되는 것), ReceiveItemData구조체에 받은 data를 넣음.
+			4) \실행파일폴더, \DLL 폴더, \자료\SCL\C#용 폴더에 HttpDll.dll 존재
+	4. 참고 문서
+		1) 참고사항.txt
+		2) SCL 의뢰검사 거래처 현황.xlsx
+		3) ReqLabMngm 사용법.txt
+	5. ReqLabMngm\자료 폴더(*표시는 중요함)
+		:* SCL : SCL dll 파일 존재, scl 에 오더 전송, 결과 받기용 dll 및 초기 코딩에 필요한 자료
+		: xxx DB : ocs 업체별 쿼리
+		: 각 병원별 폴더 : 검사코드등 필요정보
+			
+	6. 신규 병원이 선정될 경우 작업방법
+		1) 미생물 검사가 있는 경우 (1=미생물 중간결과값도 받기 ,2=검사완료값된것만 받기) 중 어떤것을 할지 검사실에 물어서 확정한다. 
+		   : modReqLabMngm.vb - SetReceiveParam()에서 병원별 셋팅
+		
+		2) SCL 본사의 담당자에게 연락하여 
+			(1) 해당병원의 scl에서 할당받은 병원코드(ex. 009414) 요청
+			(2) 아래 전화하여 SCL 접수, 결과 항목을 조율한다. (소스내 \참고사항.txt의 "# SCL 접수, 결과 항목" 참고)
+			(연락처) 김장주 보훈병원 담당	010-4925-1782	02-330-2190	jangju_kim@scllab.co.kr
+				    현정민 보훈병원이외병원 담당(주1)		02-330-0528	jeongmin_hyun@scllab.co.kr
+				    조영재 보훈병원이외병원 담당(주2)	010-3967-5223		youngjae_cho@scllab.co.kr
+					김여현 보훈병원이외병원 담당(부)	010-5097-9173		yeonhyun_kim@scllab.co.kr			
+		3) 1) 및 2)의 작업에서 얻은 자료를 GetSendParam(), SetReceiveParam(), SetReceiveItemData() 에 적용한다.
+		4) 메뉴- 기초자료 - [의뢰업체 관리], [사용자 관리], [검사코드 관리] 를 셋팅한다.
+		5) 실제 배포전에 테스트로 병원데이터 1개로 오더 전송/ 결과 받아서 병원db 에 저장 해본다.
+		6) scl 에 요청해서 테스트 데이터 삭제요청 후 병원에 프로그램을 설치해준다.
+		7) 실행파일 폴더내 HttpDll.dll, 그외 dll, conf.ini, exe 파일 및 x64폴더, x86폴더를 병원컴퓨터에 ReqLabMngm 폴더 생성 후 복사
+		8) 소스의 DB 폴더내 LabReqScl.db를 병원에 맞게 수정후 병원컴퓨터에 ReqLabMngm\DB\ 폴더로 복사
+
+[RocheHarmonyForSCL] : SCL의 harmony 장비에 대한 인터페이스 (업무협의중에 중단됨(2019.04))
+	[소스위치 : http://계정@59.23.195.70:9090/scm/repo/git/rocheharmonyforscl]
+	0. 연락처
+		SCL 검사실 : 문영현 차장 : 010-9429-6482, 02-330-2162
+		SCL 전산실 : 이성재 대리 : 010-9117-1877, 02-330-0522
+		SCL 전산실 : 김장주 대리 : 010-4925-1782, 02-330-0526
+		로슈 담당	 : 이주현 과장 : 010-3615-7817
+				   최영덕 부장 : 010-4411-2654
+		로슈 영업   : 엄시현 과장 : 010-7111-3557
+		
+		서버 : 로슈 기술담당 배영호 : 010-3596-3782
+	1. 업무협의중에 중단되었음(2019.04)
+	2. 참고 문서
+		1) 참고사항.txt
+		2) 병원정보.txt
+		3) Harmony 거래처 현황.xlsx
+	3. 자료 폴더
+		1) NAP_SD File : 장비 오더, 결과 파일 샘플
+		2) SCL받은파일 xxx: SCL에서 받은 파일
+		3) 출력파일 : 장비 출력파일
+		4) RocheHarmony 협의사항_xxx.txt : 협의사항
+		5) 용어정리.txt
+		6) 인터페이스 ip.txt
+		7) 하모니 결과 입력 방법_Length.xlsx : 하모니 결과 입력방법
+
+[RocheINFINITY]	: 신원의료재단 infinity 인터페이스
+	[소스위치 : http://계정@59.23.195.70:9090/scm/repo/git/RocheINFINITY, 브런치 : master(infinity용), SHINWON_CBC(신원의료재단 CBC 전용)]
+	[infinity 인터페이스 기능 + cisviewer 프로그램과 연동됨]
+	[로컬DB : MSSQL db 사용]
+	
+	0. 연락처
+		로슈 인피니티 담당자 : 심우태
+		[전산실]
+			장기주부장 : 010-8747-7515
+		[검사실]	
+			배경준부장 : 010-8823-1049			
+	1. 프로젝트 구분
+		: RocheOrder : 오더 프로그램
+		: RocheReOrder : 재검오더 프로그램
+		: RocheResult : 결과 프로그램
+	2. 프로그램 : nuget 사용 
+			설정방법 : visual studio -> 도구 -> neget 패키지 관리자 -> 솔루션용 Nuget 패키지 관리
+		[RocheOrder, RocheReOrder]
+			1) 각 프로젝트별 FrmRocheOrder.vb, FrmRocheReOrder.vb : 메인폼
+				: TimerOrderSend_Tick() : 오더보내기
+			2) ModHospOrder.vb, ModHospReOrder.vb : 병원 DB 관련 작업
+				: HospOrderDT(), HospReOrderDT() : 정상, 삭제 오더 가져오기, 재검은 재검프로그램에서 작업됨.
+				: GetHospRefVal() : 참고치
+			3) ModMessageOrder.vb : infinity 오더 message 처리 
+				: GetDataH() : H DATA 설정
+				: GetDataP() : P DATA 설정
+			4) ModMain.vb : 기본 프로시저 모듈(로그, 디렉토리 관련)
+				: SaveLogFile(), DeleteLog(), SaveErrorFile()..
+			5) ModOrder.vb : 오더 전송 및 로컬DB 저장
+				: SaveHospToLocalDB(), SaveHospToLocalDB_ReOrder() : 로컬DB 저장
+				: SendOrderHL7() : 오더전송
+				: ShowStatusListView() : 상태에 표시 : 상태 및 count
+			6) ModType.vb : 프로그램에서 사용할 구조체 모음 모듈
+		
+		[RocheResult]	
+			1) 각 프로젝트별 FrmRocheOrder.vb, FrmRocheReOrder.vb, FrmRocheResult.vb : 메인폼
+				: TimerOrderSend_Tick() : 오더보내기
+			2) ModHospResult.vb, ModHospSeen.vb : 병원 DB 관련 작업
+				: SaveHospSeenInfo() : SEEN 정보 저장
+				: SaveHospRst() : 병원DB에 결과 저장
+				: CheckHospRst_SHINWON() : 신원검사센터 결과 체크
+				: SetConvertRst_SHINWON() : 결과 변환
+			3) ModMessageResult.vb : infinity 결과 message 처리 
+				: SetRstFieldNoMst_INFINITY_HL7() : 필드 정보 MSH,PID,SAC,ORC, RSTSUB에서 작업(OBX,TCD,SID,NTE),EQU,SAC
+				: SetRstFieldNoSub_INFINITY_HL7 : OBX,TCD,SID,NTE
+			4) ModMain.vb : 기본 프로시저 모듈(로그, 디렉토리 관련)
+				: SaveLogFile(), DeleteLog(), SaveErrorFile()..
+			5) ModQC.vb : QC 처리
+				:SaveQC() : QC업체별 결과 저장
+			4) ModResult.vb : 결과 + SEEN 메시지 처리 
+				: SetConvertRst() : 정량결과, 정성결과, H/L, Delta, Panic, AMR, CRR, CVR 판정
+				: Result_INFINITY_HL7() : 결과 받기 + 결과 저장 + 장비 파일 삭제
+				: SaveCalcRst() : 계산식 결과의 결과저장(오더는 발생이 된 상태임) + 계산식 결과의 경우 병원DB에 저장
+				: SEEN_INFINITY_HL7() : SEEN 메시지 처리
+				: SORT_INFINITY_HL7() : SORT 메시지 처리
+				: SaveLocalRst() : 로컬DB 결과 저장
+				: SaveLocalSEEN() : : 로컬DB seen 저장
+				: SaveLocalLisResult() : LocalDB(LIS_RESULT_MST/LIS_RESULT_DTL) 저장
+				: DeleteResultFile() : 결과파일 삭제
+			4) ModType.vb : 프로그램에서 사용할 구조체 모음 모듈		
+	3. 참고 문서
+		1) 참고사항.txt
+		2) 병원정보.txt
+		3) INFINITY 거래처 현황.xlsx
+	4. 참고자료 폴더
+		1) INFINITY_HL7_FILE : HL7 오더, 결과 파일
+		2) M2I_LIS DB 구조 & 화면 : 최신 자료가 아님
+		3) 신원검사센터(자료) : 신원검사센터 DB 정보 등의 자료 
+		
+[RocheLabOrder]	: infinity 인터페이스 초기에 오더기능만 존재, 결과는 vb6.0으로 작업(	1. 소스\VB6.Roche\로슈결과 소스\에 위치)	
+	[소스위치 : http://계정@59.23.195.70:9090/scm/repo/git/rochelaborder, 브런치 : master(광주첨단종합병원), 광주첨단종합병원(cacheDB),권태경내과_Excel(포닥터), 목포중앙병원(트윈), 바코드출력(마리아)] 
+	[병원정보.txt 파일에 병원별 연락처 특이사항 기록되어 있음]
+	
+	#. 프로세스는 [RocheLabResult] 참조
+	
+	1. 적용병원 
+		JS메디칼 : git 브런치 : master
+		순천미즈병원 : git 브런치 : master
+		권태경내과 : git 브런치 : 권태경내과_Excel(포닥터)
+		평택 성심중앙병원 : git 브런치 : master
+		대전코스모내과 : git 브런치 : master (일부 묶음코드의 경우 오더에는 빠지는데, 결과는 들어가야 되는 경우가 발생해서 RocheLabResult(오더가 있어야 결과가 들어감)로 변경을 못함)
+		광주첨단종합병원 : git 브런치 : 광주첨단종합병원(cacheDB)
+		목포중앙병원 : git 브런치 : 목포중앙병원(트윈)
+		용인 삼성노블카운티 : 초기 설치했으나 현재 infinity 사용안함
+		대구 마리아 : git 브런치 : 바코드출력(마리아), 사용안함
+		
+[RocheLabResult] : infinity 인터페이스(오더+결과 같이 사용)
+	[소스위치 : http://계정@59.23.195.70:9090/scm/repo/git/rochelaborder
+	[로컬DB : MSSQL db 사용]
+	[오더는 "오더전송"의 spread에 뿌린후 체크한 것만 전송한다.]
+	[결과는 spread에 뿌리지 않고 저장한다.]
+	[참고자료 폴더의 Roche Infinity Interface.pptx(INFINITY 인터페이스 프로그램 구조 및 설명)를 먼저 읽은후 소스 볼것.]
+	[병원정보.txt 파일에 병원별 연락처 특이사항 기록되어 있음]
+	[table 정보는 DB 폴더내에 존재]
+	
+	
+	#.프로세스
+		1) RocheLabResult 프로그램 실행
+			(0)conf.ini 를 통한 환경설정 파일 읽음
+		2) 로슈의 infinity 서버의 공유폴더 (administrator/itserver)
+			(0)[IN] 폴더 : RocheLabResult 프로그램에서 오더파일을 보냄
+			(1)[OUT] 폴더 : RocheLabResult 프로그램에서 결과파일을 받음
+		3) Timer를 돌면서 병원db 에서 오더 조회후 오더 파일 생성후 infinity 서버의 [IN] 공유폴더로 전송
+		4) Timer를 돌면서 infinity 서버의 [OUT] 공유폴더의 결과 파일을 가져와서 파싱후 로컬DB+병원DB update
+		
+						
+	0. 연락처		
+		: INFINITY 거래처 현황.xlsx 참고		
+	1. 프로젝트 구분
+		RocheLabResult : infinity 인터페이스(오더+결과 같이 사용)
+		RocheTAT : 검사실 샘플도착처리(FrmSampleArrivalJubSu) + tat 화면(FrmRocheTAT) : 강릉우리들병원에서만 사용
+		
+	2. 프로그램 : nuget 사용  
+			설정방법 : visual studio -> 도구 -> neget 패키지 관리자 -> 솔루션용 Nuget 패키지 관리		
+			0) ApplicationEvents.vb : 프로젝트의 시작지점
+			1)FrmMain.vb : 메인폼
+				
+				: TimerAutoReceiveResult_Tick() :  결과받기
+			[오더]
+				: TimerAutoSend_Tick() : 오더보내기
+				: AutoSendDoWork() : 오더전송+로컬DB저장+이전데이터 삭제+ order 폴더의 파일 삭제
+				: SaveLocalDBOrder() : 병원order를 로컬DB에 저장				 
+				: SendOrder() : ASTM용 오더 보내기
+				: SendOrderHL7() : HL7 오더 보내기
+				: RtrvOrder() : 오더 조회해서 화면(SPREAD)에 뿌림
+				: RtrvLocalDBOrder() : 로컬db에서 오더 조회해서 화면(SPREAD)에 뿌림
+				: UpdateStateLocalDBandHospDB() : 전송상태를 로컬DB + (일부병원DB)에 업데이트 + spread에 sendflag, senddate 표시
+			[결과]
+				: AutoReceiveResultDoWork() : 결과 받기(결과, QC, Seen : Seen폴더와 결과 폴더가 같은 경우) + 결과 저장 + infinity 파일 삭제 + result 폴더의 파일 삭제
+				: AutoReceiveSeenDoWork() : Seen 폴더 별도로 존재하는 경우 Seen 처리
+				: AutoSendP312() : 전북익산병원 전용(202010이후부터 사용안함):전처리 장비 P312 결과오더:오 더전송한 것중 병원DB에서 바코드, INFINITYCODE별 결과가 모두 나온 경우 'P312용 결과오더 MESSAGE' 생성
+				: AutoSendQC() : HL7 QC오더보내기 : 진주경상대 전용(진주경상대는 현재 이 프로그램을 사용안하므로 필요 없음)
+				: ReceiveResult() : 결과 받기
+				: SaveLocalDBResult() : 로컬DB 결과 저장 + 계산식 결과저장 + 계산식 결과의 경우 병원DB에 저장 + Log파일 저장 + COMMENT 저장
+				: SaveLocalDBSEEN() : seen 메시지 저장(현재 서산중앙병원만 사용) 
+				: SaveLocalDBResultCalc() : 계산식 결과의 결과저장(오더는 발생이 된 상태임) + 계산식 결과의 경우 병원DB에 저장
+				: SaveResult() : QC DATA 저장(LabOrder table) + 결과저장
+				: SaveResultHosp_HL7 : 병원 결과저장(HL7용)
+				: RtrvLocalDBResult() : 컬db에서 결과조회해서 화면(SPREAD)에 뿌림
+			2) ModHospOrder.vb, ModHospReOrder.vb : 병원 DB 관련 작업
+				: TimerAutoSend_Tick() : 오더보내기
+				: GetHospRefVal() : 참고치
+			3) ModMessageOrder.vb : infinity 오더 message 처리 
+				: GetDataH() : H DATA 설정
+				: GetDataP() : P DATA 설정
+			4) ModMain.vb : 기본 프로시저 모듈(로그, 디렉토리 관련)
+				: SaveLogFile(), DeleteLog(), SaveErrorFile()..
+			5) ModOrder.vb : 오더 전송 및 로컬DB 저장
+				: SaveHospToLocalDB(), SaveHospToLocalDB_ReOrder() : 로컬DB 저장
+				: SendOrderHL7() : 오더전송
+				: ShowStatusListView() : 상태에 표시 : 상태 및 count
+			6) ModType.vb : 프로그램에서 사용할 구조체 모음 모듈
+			7) ModDBUpgradeMSSQL.vb : 로컬DB alter table
+				: MSSQLUpgrade : 실행시 로컬DB 자동 alter table 됨.
+	3. 참고 문서
+		1) 참고사항.txt
+		2) 병원정보.txt
+		3) INFINITY 거래처 현황.xlsx
+		4) RocheLabResult 설명.txt
+		5) 의사랑 RocheLabResult 사용법.txt
+		6) Cache 작업방법.txt : 광주첨단병원
+	4. 참고자료 폴더
+		1) Infinity(ASTM) : Infinity ASTM 오더, 결과 파일
+		2) infinity(HL7) : infinity HL7 오더, 결과 파일
+		3) it3000(ASTM) :  IT3000 ASTM 오더, 결과 파일 
+		4) it3000(HL7) :  IT3000 HL7 오더, 결과 파일 
+		5) 각 병원폴더 : 각병원별 쿼리 및 검사코드등 자료
+		6) * Roche Infinity Interface.pptx : INFINITY 인터페이스 프로그램 구조 및 설명
+		7) cobas_infinity_2.1_ASTM_PSM_HIM_3.0.pdf
+		8) cobas_infinity_2.1_HL7_default_HIM_3.0.pdf
+		9) IT3000 v2.10 host interface manual.pdf
+
+[TAT_SSJUNGANG] : 서산중앙병원전용 TAT 화면
+	[소스위치 : http://계정@59.23.195.70:9090/scm/repo/git/tat_ssjungang]
+	[로컬DB : MSSQL db 사용]
+	[로컬DB의 프로시저는 \ROCHE_TAT\Procedure\폴더에 있음]
+
+[zebra.print] : zebra print 메뉴얼 + 소스
+	[소스위치 : http://계정@59.23.195.70:9090/scm/repo/git/zebra.print]
+	1. 문서
+		: zpl-zbi2-pm-en.pdf : zpl 명령어		
+		: HH_Command.pdf : zpl 명령어중 HH 명령어 사용법
+		: gk420d-ug-ko.pdf : gk420d 프린터 사용자 설명서
+		: zd410d-ug-ko.pdf : zd410d 프린터 사용자 설명서 
+		: ZPL 명령어 사용법.pdf : zpl 명령어 정리
+==========================================================================================	
+
+
+
+
+[ReqLabMngm 참고 자료: (소스내 \참고사항.txt의 "# SCL 접수, 결과 항목" 참고)]
+	########################################################################################################
+	# SCL 접수, 결과 항목
+	########################################################################################################
+	[SCL]
+		[접수]
+		순서		항목
+		0(pk)	병원검체번호(100 Bytes) 
+		1(pk)	병원검사코드
+		2	병원검체코드
+		3   	병원검사명칭
+		4	병원검체명칭
+		5(pk)	차트 번호(15 Bytes)
+		6	환자명 :
+		7   	주민번호(6) : 생년월일, 세강병원은 주민번호 앞7자리 전송
+		8	나이
+		9	성별(M,F)
+		10	진료과목코드
+		11	진료의	
+		'아래는 필요시 추가
+		12	병동
+		13	병원접수일자
+		14	병원접수번호
+	 
+
+		[결과]
+		순서		항목        
+		0(pk)   차트번호(15 Bytes) chartNo    
+		1(pk)   거래처검사코드(20 Bytes) hItemCode 
+		2(pk)   병원검체번호(바코드)(100 Bytes) barCode : 바코드 없으면 병원접수일자+차트번호(horddate+chartno)
+		3       결과(30 Bytes)        '결과는 4,5,6번중 1곳만 들어감
+		4       검출결과(30 Bytes)
+		5       서술형결과(4006 Bytes)
+		6       리마크(검체,,,,)(4000 Bytes) ResultRemark
+		7       코멘트(결과에 관한것.)(4000 Bytes) ResultComment
+		8       SCL 접수일자 ReqReceiptDate ' horddate는 병원 접수일자, ReqReceiptDate는 SCL이 접수한 접수일자이며 둘은 서로 다를수 있다.
+		9       SLC 접수번호 ReqReceiptNo
+		10      SCL 보고일자(완료일자) ReqResultDate
+		'아래는 부가항목
+		11      중간, 최종값 구분 ResultState
+		12      단위 Unit
+		13      참고치 Rfvl
+		14      참고치상 RfvlHigh
+		15      참고치하 RfvlLow
+		16      확인전문의 ReadingDr
+		'아래는 필요시	
+		17      병원접수일자
+		18      병원접수번호
+		19		결과유형 flag
+
+
+	[보훈병원 SCL]
+		[접수]
+		순서		항목
+	(pk)0		병원검체번호(100 Bytes) 
+	(pk)1		병원검사코드
+		2		병원검체코드
+		3   	병원검사명칭
+		4		병원검체명칭
+	(pk)5		차트 번호(15 Bytes)
+		6		환자명 :
+		7   	주민번호(6) : 생년월일
+		8		나이
+		9		성별(M,F)
+		10		진료과목코드
+		11		진료의	
+		12		병동
+		13		병원접수일자
+		14		병원접수번호 : 결과 받을 때 사용할 여러가지 정보를 묶어서 넣음. 구분자 : ^
+		15		병원보험코드
+
+	 
+		[결과]
+		<일반검사>
+		순서		항목        
+	(pk)0		차트번호(15 Bytes) chartNo    
+	(pk)1	   거래처검사코드(20 Bytes) hItemCode 
+	(pk)2	   병원검체번호(바코드)(100 Bytes) barCode : 바코드 없으면 병원접수일자+차트번호(horddate+chartno)	
+		3       결과(30 Bytes)        '결과는 4,5,6번중 1곳이상 들어감 -> 결과받을 때 연결시켜야 됨
+		4       검출결과(4006 Bytes)
+		5       서술형결과(4006 Bytes)
+		6       리마크(검체,,,,)(4000 Bytes) ResultRemark
+		7       코멘트(결과에 관한것.)(4000 Bytes) ResultComment
+		8       SCL 접수일자 ReqReceiptDate ' horddate는 병원 접수일자, ReqReceiptDate는 SCL이 접수한 접수일자이며 둘은 서로 다를수 있다.
+		9       SLC 접수번호 ReqReceiptNo
+		10      SCL 보고일자(완료일자) ReqResultDate
+		'아래는 부가항목
+		11      중간, 최종값 구분 ResultState
+		12      단위 Unit
+		13      참고치 Rfvl
+		14      참고치상 RfvlHigh
+		15      참고치하 RfvlLow
+		16      확인전문의 ReadingDr
+		17      병원접수일자
+		18      병원접수번호 : 접수시 여러가지 정보, 구분자 : ^
+		19      이미지유무
+		20      검체코드
+		'SCL 요청으로 추가됨(사용안함)	
+		21      환자명
+		22      SCL결과지
+		'보훈병원 결과에 참고치 넣을때 사용할 플래그
+		23		결과유형 flag
+
+
+		<해부병리>
+		순서		항목        
+	(pk)0		차트번호(15 Bytes) chartNo    
+	(pk)1	   거래처검사코드(20 Bytes) hItemCode 
+	(pk)2	   병원검체번호(바코드)(100 Bytes) barCode : 바코드 없으면 병원접수일자+차트번호(horddate+chartno)	
+		3       결과(30 Bytes)        '결과는 4,5,6번중 1곳만 들어감
+		4       검출결과(30 Bytes)
+		5       서술형결과(4006 Bytes)
+		6       리마크(검체,,,,)(4000 Bytes) ResultRemark
+		7       코멘트(결과에 관한것.)(4000 Bytes) ResultComment
+		8       SCL 접수일자 ReqReceiptDate ' horddate는 병원 접수일자, ReqReceiptDate는 SCL이 접수한 접수일자이며 둘은 서로 다를수 있다.
+		9       SLC 접수번호 ReqReceiptNo
+		10      SCL 보고일자(완료일자) ReqResultDate
+		'아래는 부가항목
+		11      중간, 최종값 구분 ResultState
+		12      단위 Unit
+		13      참고치 Rfvl
+		14      참고치상 RfvlHigh
+		15      참고치하 RfvlLow
+		16      확인전문의 ReadingDr
+		17      병원접수일자
+		18      병원접수번호 : 접수시 여러가지 정보, 구분자 : ^
+		19      이미지유무
+		20      검체코드
+		'SCL 요청으로 추가됨(사용안함)
+		21      환자명
+		22      SCL결과지
+		'보훈병원 결과에 참고치 넣을때 사용할 플래그
+		23		결과유형 flag
+		'해부병리 결과
+		24		RGross
+		25		RDiagnosis
+		26		RMicro
+
+
+	   * 결과와 검출결과는 자항목 각각 1:1로 매칭될 검사코드가 있을때의 최대길이입니다.
+	   1:1로 연동가능한 검사코드가 없을시엔 자항목 결과가 한묶음으로 묶여 나가기에 한번에 나가는 데이터크기는 최대 서술형 결과크기정도로 커질 수 도 있습니다. 
+
+
+
+
+
+
+

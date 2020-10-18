@@ -1,0 +1,20 @@
+[VB6.Roche.txt] 
+	파일위치 : 인수인계\1. 소스\VB6.Roche\	
+	폴더의미 : infinity 결과용 vb6 소스
+==========================================================================================	
+[infinity 결과 vb6 소스 위치(2군데 존재함)]
+	1)컴퓨터 : 59.23.195.70 폴더 : D:\[M2I_SOFT]\[M2I Source]\001.Source\INFINITY\결과 VB6
+	2)git 위치 [소스위치 : http://계정@59.23.195.70:9090/scm/repo/git/vb6.roche]
+	
+[폴더정보] : infinity 결과 vb6 소스 위치 
+	: [소스위치 : http://계정@59.23.195.70:9090/scm/repo/git/vb6.roche]
+	
+	[MQS 소스(로슈)] : 참고자료로 필요 없음
+	[로슈결과 소스] : vb6.0용  infinity 소스임, 아래소스는 D:\[M2I_SOFT]\[M2I Source]\001.Source\INFINITY\결과 VB6\폴더내도 존재
+		:C0001.광주.광주첨단종합병원(CacheDB,전처리,bioradQC)(최종소스가 이성현주임껄로 바뀜)
+		:C0002.목포.목포중앙병원(전처리,easyQC)
+		:C0003.천안.JS_Medical(로슈 QC 연동포함)
+		:C0004.대전.코스모내과의원
+		:C0005.순천.미즈병원
+		:C0006.부산.권태경내과
+	[Roche Interface manual.zip] : manual

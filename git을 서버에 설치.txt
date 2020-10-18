@@ -1,0 +1,58 @@
+[git을 서버에 설치]
+1. java 설치 :jre (git 실행에 필요)
+
+2. git 설치(https://git-scm.com/)
+
+3. SCM Manager 설치(standalone방식), 방화벽 허용, 사용자
+http://www.scm-manager.org/download/
+
+
+[SCM Manager 관련 설정 파일 위치 : 사용자\사용자 계정\.scm\config]
+
+[scm-server 실행 순서]
+
+	* D:\scm-server\bin\scm-server.bat(반드시 실행되고 있어야 한다.) 실행 후 웹으로 접속(scmmanager)
+
+[scmmanager]
+
+	* 변경 : http:\\localhost:9090 로 접속(scmadmin : 911vs119)
+	* 기본 : http:\\localhost:9090 로 접속(scmadmin : scmadmin)
+	* >> 윈도우 방화벽 인바운드 9090 포트 허용
+
+
+[config - repository types] : git settings 를 제외한 나머지는 disabled  체크
+
+	* git settings
+	* repository directory : d:\repositores\git 로 변경
+
+
+[security - users]
+
+	* :add : 사용자 추가
+	* id : gituser
+	* 
+
+	* :scmadmin pwd 변경
+	* scmadmin/911vs119
+
+
+[Main - repositories 추가]
+
+	* name : emr.m2isoft.git
+	* type : git
+	* repositories 생성후 사용자 추가 :  permissions 설정 : group : 체크,  name : users, permissions:write
+
+
+[SCM Manager 관련 설정 파일 위치 : 사용자\사용자 계정\.scm\config폴더백업해 놓음]
+
+[repositories의 프로젝트 명칭을 변경하는 법]
+	1.scm-server 중지
+	2.SCM Manager 관련 설정 파일 위치에서 repositories.xml파일을 수정(사용자\사용자 계정\.scm\config\repositories.xml)
+	3.실제 repositories 가 저정되는 폴더에서 폴더명칭 변경
+	4.scm-server 실행후 scmmanager(http:\\localhost:8080)에 들어가서 확인하면 됨.
+
+
+[클라이언트 소스가져오기]
+
+	[원격저장소 설정]
+	http://계정@59.23.195.70:9090/scm/git/AdoNetSample
